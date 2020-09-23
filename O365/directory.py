@@ -322,3 +322,31 @@ class Directory(ApiComponent):
 
         url = self.build_url('')  # target main_resource
         return self._get_user(url, query=query)
+
+    def reset_password(self,
+                       user,
+                       password, 
+                       force_change_password_next_sign_in=False,
+                       force_change_password_next_sign_in_with_mfa=False):
+        """ Update a user password .
+        Need permissions Directory.AccessAsUser.All in addition of basic ones
+        See https://docs.microsoft.com/fr-fr/graph/api/user-update?view=graph-rest-1.0&tabs=http
+
+        :param str user: the user id or user principal name
+        :param str password: wanted password
+        :param bool force_change_password_next_sign_in: explicit
+        :param bool force_change_password_next_sign_in_with_mfa: explicit
+        """
+        url = self.build_url(self._endpoints.get('get_user').format(email=user))
+        data = {
+            'passwordProfile': {
+                'password': password,
+                'forceChangePasswordNextSignIn': force_change_password_next_sign_in,
+                'forceChangePasswordNextSignInWithMfa': force_change_password_next_sign_in_with_mfa,
+            }
+        }
+        response = self.con.patch(url, data=data, headers={'Content-Type': 'application/json'})
+
+        return bool(response)
+
+
