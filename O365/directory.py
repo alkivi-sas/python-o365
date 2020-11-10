@@ -349,4 +349,44 @@ class Directory(ApiComponent):
 
         return bool(response)
 
+    def add_user(self,
+                 display_name,
+                 user_principal_name,
+                 password,
+                 mail_nickname=None,
+                 force_change_password_next_sign_in=False,
+                 force_change_password_next_sign_in_with_mfa=False,
+                 account_enabled=True,
+                 **kwargs,
+                 ):
+        data = {
+            'accountEnabled': account_enabled,
+            'displayName': display_name,
+            'userPrincipalName': user_principal_name,
+            'mailNickname': mail_nickname,
+            'passwordProfile': {
+                'password': password,
+                'forceChangePasswordNextSignIn': force_change_password_next_sign_in,
+                'forceChangePasswordNextSignInWithMfa': force_change_password_next_sign_in_with_mfa,
+            },
+        }
+
+        properties = [
+            'aboutMe',
+            'companyName',
+            'passwordPolicies',
+            'surname',
+            'givenName',
+            'mobilePhone',
+            'mail',
+        ]
+        for prop in properties:
+            if prop in kwargs:
+                data[prop] = kwargs[prop]
+
+        url = 'https://graph.microsoft.com/v1.0/users'
+        response = self.con.post(url, data=data, headers={'Content-Type': 'application/json'})
+
+        return bool(response)
+
 
